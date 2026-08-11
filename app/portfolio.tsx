@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 const projects = [
   {
@@ -38,8 +38,6 @@ const capabilities = [
 export function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
-  const cursorRef = useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     const elements = document.querySelectorAll(".reveal");
     const observer = new IntersectionObserver(
@@ -48,12 +46,7 @@ export function Portfolio() {
     );
     elements.forEach((element) => observer.observe(element));
 
-    const moveCursor = (event: PointerEvent) => {
-      cursorRef.current?.style.setProperty("--x", `${event.clientX}px`);
-      cursorRef.current?.style.setProperty("--y", `${event.clientY}px`);
-    };
-    window.addEventListener("pointermove", moveCursor);
-    return () => { observer.disconnect(); window.removeEventListener("pointermove", moveCursor); };
+    return () => observer.disconnect();
   }, []);
 
   async function submitContact(event: FormEvent<HTMLFormElement>) {
@@ -76,7 +69,6 @@ export function Portfolio() {
 
   return (
     <main>
-      <div className="cursor-orb" ref={cursorRef} aria-hidden="true" />
       <nav className="nav shell" aria-label="Main navigation">
         <a className="brand" href="#top" aria-label="Aarin Jain, home">AJ<span>.</span></a>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="navigation-links">
