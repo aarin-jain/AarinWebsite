@@ -77,6 +77,7 @@ export function Portfolio() {
         <div id="navigation-links" className={`nav-links ${menuOpen ? "open" : ""}`}>
           <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
           <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
+          <a href="/writing" onClick={() => setMenuOpen(false)}>Writing</a>
           <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
         </div>
         <a className="availability" href="#contact"><i /> Available for select projects</a>
