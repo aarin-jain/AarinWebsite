@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 const projects = [
   {
@@ -38,6 +38,23 @@ const capabilities = [
 export function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const cursorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const elements = document.querySelectorAll(".reveal");
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => entry.isIntersecting && entry.target.classList.add("in-view")),
+      { threshold: 0.14 },
+    );
+    elements.forEach((element) => observer.observe(element));
+
+    const moveCursor = (event: PointerEvent) => {
+      cursorRef.current?.style.setProperty("--x", `${event.clientX}px`);
+      cursorRef.current?.style.setProperty("--y", `${event.clientY}px`);
+    };
+    window.addEventListener("pointermove", moveCursor);
+    return () => { observer.disconnect(); window.removeEventListener("pointermove", moveCursor); };
+  }, []);
 
   async function submitContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,6 +76,7 @@ export function Portfolio() {
 
   return (
     <main>
+      <div className="cursor-orb" ref={cursorRef} aria-hidden="true" />
       <nav className="nav shell" aria-label="Main navigation">
         <a className="brand" href="#top" aria-label="Aarin Jain, home">AJ<span>.</span></a>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="navigation-links">
@@ -72,7 +90,8 @@ export function Portfolio() {
         <a className="availability" href="#contact"><i /> Available for select projects</a>
       </nav>
 
-      <section className="hero shell" id="top">
+      <section className="hero shell reveal in-view" id="top">
+        <span className="vertical-mark" aria-hidden="true">デザイン・開発・好奇心</span>
         <p className="eyebrow">Designer × Developer × Builder</p>
         <h1>I make digital<br />things feel <em>human.</em></h1>
         <div className="hero-bottom">
@@ -82,14 +101,14 @@ export function Portfolio() {
         <div className="ticker" aria-hidden="true"><span>Strategy</span><b>✦</b><span>Design</span><b>✦</b><span>Engineering</span><b>✦</b><span>Curiosity</span></div>
       </section>
 
-      <section className="work shell" id="work">
+      <section className="work shell reveal" id="work">
         <div className="section-heading">
           <div><p className="eyebrow">Selected work</p><h2>A few things I’m<br />proud to have made.</h2></div>
           <p className="section-note">Thoughtful products for ambitious teams, from zero-to-one ideas to systems used at scale.</p>
         </div>
         <div className="project-grid">
           {projects.map((project) => (
-            <article className="project" key={project.title}>
+            <article className="project reveal" key={project.title}>
               <div className={`project-visual ${project.className}`}>
                 <span className="project-number">{project.number}</span>
                 <div className="mockup"><div className="mockup-bar" /><div className="mockup-copy"><small>{project.type}</small><strong>{project.title}</strong><span /></div></div>
@@ -104,9 +123,9 @@ export function Portfolio() {
         </div>
       </section>
 
-      <section className="about" id="about">
+      <section className="about reveal" id="about">
         <div className="shell about-inner">
-          <p className="eyebrow">How I work</p>
+          <p className="eyebrow">How I work · 方法</p>
           <h2>Equal parts systems<br />thinking and <em>making.</em></h2>
           <div className="capabilities">
             {capabilities.map(([number, title, copy]) => (
@@ -120,7 +139,7 @@ export function Portfolio() {
         </div>
       </section>
 
-      <section className="contact shell" id="contact">
+      <section className="contact shell reveal" id="contact">
         <div className="contact-intro"><p className="eyebrow">Start a conversation</p><h2>Have a good<br />problem to solve?</h2><p>Tell me a little about it. I read every note and usually reply within two working days.</p></div>
         <form onSubmit={submitContact}>
           <label>Name<input name="name" autoComplete="name" required placeholder="Your name" /></label>
