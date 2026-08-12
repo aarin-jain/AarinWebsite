@@ -59,18 +59,25 @@ export function Portfolio() {
 
   async function submitContact(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setStatus("sending");
-    const form = new FormData(event.currentTarget);
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(Object.fromEntries(form)),
-    });
+    const form = new FormData(formElement);
 
-    if (response.ok) {
-      event.currentTarget.reset();
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(form)),
+      });
+
+      if (!response.ok) {
+        setStatus("error");
+        return;
+      }
+
+      formElement.reset();
       setStatus("sent");
-    } else {
+    } catch {
       setStatus("error");
     }
   }
