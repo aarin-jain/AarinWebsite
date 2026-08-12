@@ -2,37 +2,45 @@
 
 import { FormEvent, useEffect, useState } from "react";
 
-const projects = [
+const experience = [
   {
     number: "01",
-    title: "Signal",
-    type: "Product design",
-    description: "A calmer way for teams to turn scattered customer feedback into decisions.",
-    tags: ["Next.js", "TypeScript", "AI"],
-    className: "signal",
+    company: "Amazon",
+    role: "Software Development Engineer",
+    team: "Financial Technology",
+    period: "2026 — Present",
+    description: "Building scalable AWS data systems, reconciliation workflows, and AI-assisted tools for financial technology.",
   },
   {
     number: "02",
-    title: "Common Ground",
-    type: "Brand & web",
-    description: "A new digital home for a studio building climate-positive places.",
-    tags: ["Strategy", "Identity", "Web"],
-    className: "common",
+    company: "NCR Voyix",
+    role: "Software Engineer Intern",
+    team: "Retail Technology",
+    period: "Summer 2024",
+    description: "Built a responsive React dashboard and reusable widgets for visualizing retail loyalty data across microservices.",
   },
   {
     number: "03",
-    title: "Pulse",
-    type: "Full-stack app",
-    description: "Private, lightweight habit tracking built for consistency—not streak anxiety.",
-    tags: ["React", "Cloudflare", "D1"],
-    className: "pulse",
+    company: "Gas South",
+    role: "Data Analytics Intern",
+    team: "Operations Analytics",
+    period: "Spring 2024",
+    description: "Used Python, R, SQL, and Power BI to turn customer and enrollment data into operational decisions.",
+  },
+  {
+    number: "04",
+    company: "Republic National Distributing Company",
+    role: "Data Engineering Intern",
+    team: "Data Analytics",
+    period: "Summer 2023",
+    description: "Developed forecasting dashboards and data interfaces connecting warehouse systems across 40+ locations.",
   },
 ];
 
 const capabilities = [
-  ["01", "Product thinking", "Turning ambiguous ideas into a focused product, with a clear reason for every feature."],
-  ["02", "Design systems", "Building expressive, reusable interfaces that stay coherent as products grow."],
-  ["03", "Full-stack craft", "Taking products from first sketch to resilient, accessible, production-ready software."],
+  ["01", "Software engineering", "Designing reliable full-stack systems with Java, Python, JavaScript, TypeScript, SQL, React, and AWS."],
+  ["02", "Applied AI & data", "Building practical machine-learning, analytics, and automation workflows that turn complex data into useful outcomes."],
+  ["03", "Technical leadership", "Making difficult ideas approachable through clear documentation, collaboration, and experience teaching computer science."],
 ];
 
 export function Portfolio() {
@@ -80,37 +88,31 @@ export function Portfolio() {
           <a href="/writing" onClick={() => setMenuOpen(false)}>Writing</a>
           <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
         </div>
-        <a className="availability" href="#contact"><i /> Available for select projects</a>
+        <a className="availability" href="#contact"><i /> Software engineer at Amazon</a>
       </nav>
 
       <section className="hero shell reveal in-view" id="top">
         <span className="vertical-mark" aria-hidden="true">デザイン・開発・好奇心</span>
-        <p className="eyebrow">Designer × Developer × Builder</p>
-        <h1>I make digital<br />things feel <em>human.</em></h1>
+        <p className="eyebrow">Software Engineer × AI × Data</p>
+        <h1>I build systems<br />that make <em>sense.</em></h1>
         <div className="hero-bottom">
-          <p>I’m Aarin—a product-minded designer and engineer creating useful, characterful experiences from first idea to final detail.</p>
+          <p>I’m Aarin, a software engineer at Amazon and Georgia Tech computer science graduate. I build reliable products at the intersection of cloud systems, data, and applied AI.</p>
           <a className="round-link" href="#work" aria-label="Explore selected work">↓</a>
         </div>
-        <div className="ticker" aria-hidden="true"><span>Strategy</span><b>✦</b><span>Design</span><b>✦</b><span>Engineering</span><b>✦</b><span>Curiosity</span></div>
+        <div className="ticker" aria-hidden="true"><span>Engineering</span><b>✦</b><span>Cloud</span><b>✦</b><span>Applied AI</span><b>✦</b><span>Curiosity</span></div>
       </section>
 
       <section className="work shell reveal" id="work">
         <div className="section-heading">
-          <div><p className="eyebrow">Selected work</p><h2>A few things I’m<br />proud to have made.</h2></div>
-          <p className="section-note">Thoughtful products for ambitious teams, from zero-to-one ideas to systems used at scale.</p>
+          <div><p className="eyebrow">Experience</p><h2>Learning by<br />building at scale.</h2></div>
+          <p className="section-note">Experience across financial technology, retail software, analytics, and data engineering.</p>
         </div>
-        <div className="project-grid">
-          {projects.map((project) => (
-            <article className="project reveal" key={project.title}>
-              <div className={`project-visual ${project.className}`}>
-                <span className="project-number">{project.number}</span>
-                <div className="mockup"><div className="mockup-bar" /><div className="mockup-copy"><small>{project.type}</small><strong>{project.title}</strong><span /></div></div>
-              </div>
-              <div className="project-copy">
-                <div><p>{project.type}</p><h3>{project.title}</h3></div>
-                <p>{project.description}</p>
-              </div>
-              <div className="tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+        <div className="experience-list">
+          {experience.map((item) => (
+            <article className="experience-row reveal" key={item.company}>
+              <span>{item.number}</span>
+              <div><p>{item.period}</p><h3>{item.company}</h3><p>{item.role} · {item.team}</p></div>
+              <p>{item.description}</p>
             </article>
           ))}
         </div>
@@ -119,21 +121,21 @@ export function Portfolio() {
       <section className="about reveal" id="about">
         <div className="shell about-inner">
           <p className="eyebrow">How I work · 方法</p>
-          <h2>Equal parts systems<br />thinking and <em>making.</em></h2>
+          <h2>Engineering with<br />context and <em>care.</em></h2>
           <div className="capabilities">
             {capabilities.map(([number, title, copy]) => (
               <article key={title}><span>{number}</span><h3>{title}</h3><p>{copy}</p></article>
             ))}
           </div>
           <div className="about-story">
-            <p>Based in California, working with good people everywhere.</p>
-            <p>I care about the small things that make software feel obvious: the sentence that removes doubt, the motion that explains what changed, and the system that lets a team move faster.</p>
+            <p>Georgia Tech CS, Intelligence & Theory. Now based in Bellevue, Washington.</p>
+            <p>I’ve worked across financial technology, retail platforms, operations analytics, and data engineering. I’m most interested in systems that make complex work clearer, faster, and more dependable.</p>
           </div>
         </div>
       </section>
 
       <section className="contact shell reveal" id="contact">
-        <div className="contact-intro"><p className="eyebrow">Start a conversation</p><h2>Have a good<br />problem to solve?</h2><p>Tell me a little about it. I read every note and usually reply within two working days.</p></div>
+        <div className="contact-intro"><p className="eyebrow">Start a conversation</p><h2>Let’s talk<br />technology.</h2><p>The easiest way to reach me is <a className="text-link" href="mailto:aarinj@gmail.com">aarinj@gmail.com</a>. I read every note and usually reply within two working days.</p></div>
         <form onSubmit={submitContact}>
           <label>Name<input name="name" autoComplete="name" required placeholder="Your name" /></label>
           <label>Email<input name="email" type="email" autoComplete="email" required placeholder="you@company.com" /></label>
@@ -143,7 +145,7 @@ export function Portfolio() {
         </form>
       </section>
 
-      <footer className="shell"><a className="brand" href="#top">AJ<span>.</span></a><p>© {new Date().getFullYear()} Aarin Jain</p><div><a href="https://www.linkedin.com" target="_blank" rel="noreferrer">LinkedIn</a><a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a></div></footer>
+      <footer className="shell"><a className="brand" href="#top">AJ<span>.</span></a><p>© {new Date().getFullYear()} Aarin Jain</p><div><a href="mailto:aarinj@gmail.com">Email</a><a href="https://www.linkedin.com/in/aarin-jain" target="_blank" rel="noreferrer">LinkedIn</a></div></footer>
     </main>
   );
 }

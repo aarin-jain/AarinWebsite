@@ -18,8 +18,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
   const origin = `${protocol}://${host}`;
-  const title = "Aarin Jain — Designer & Developer";
-  const description = "Aarin Jain is a product-minded designer and engineer creating useful, characterful digital experiences.";
+  const title = "Aarin Jain — Software Engineer";
+  const description = "Aarin Jain is a software engineer at Amazon working across cloud systems, data, and applied AI.";
 
   return {
     metadataBase: new URL(origin),
