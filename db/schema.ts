@@ -6,6 +6,7 @@ export const contactMessages = sqliteTable("contact_messages", {
   name: text("name").notNull(),
   email: text("email").notNull(),
   message: text("message").notNull(),
+  readAt: text("read_at"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
 });
 
