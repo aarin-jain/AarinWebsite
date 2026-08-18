@@ -3,8 +3,8 @@ import { defineConfig } from "vite";
 import hostingConfig from "./.openai/hosting.json";
 import { sites } from "./build/sites-vite-plugin";
 
-const SITE_CREATOR_PLACEHOLDER_DATABASE_ID =
-  "00000000-0000-4000-8000-000000000000";
+const CLOUDFLARE_D1_DATABASE_ID =
+  "bd2b18b2-2566-469d-8d29-ea662e610ada";
 
 const { d1, r2 } = hostingConfig;
 
@@ -18,8 +18,8 @@ const localBindingConfig = {
     ? [
         {
           binding: d1,
-          database_name: "site-creator-d1",
-          database_id: SITE_CREATOR_PLACEHOLDER_DATABASE_ID,
+          database_name: "aarinwebsite-db",
+          database_id: CLOUDFLARE_D1_DATABASE_ID,
         },
       ]
     : [],
