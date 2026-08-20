@@ -1,5 +1,4 @@
 import { desc, eq } from "drizzle-orm";
-import { getChatGPTUser } from "../../chatgpt-auth";
 import { getDb } from "../../../db";
 import { posts } from "../../../db/schema";
 
@@ -11,9 +10,6 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await getChatGPTUser();
-  if (!user) return Response.json({ error: "Sign in is required." }, { status: 401 });
-
   try {
     const body = (await request.json()) as { title?: string; excerpt?: string; content?: string; status?: string };
     const title = body.title?.trim() ?? "";
@@ -24,7 +20,7 @@ export async function POST(request: Request) {
 
     const slug = await uniqueSlug(title);
     const now = new Date().toISOString();
-    const [post] = await getDb().insert(posts).values({ title, slug, excerpt, content, status, authorId: user.userId, publishedAt: status === "published" ? now : null, updatedAt: now }).returning();
+    const [post] = await getDb().insert(posts).values({ title, slug, excerpt, content, status, authorId: "aarin", publishedAt: status === "published" ? now : null, updatedAt: now }).returning();
     return Response.json({ post }, { status: 201 });
   } catch { return Response.json({ error: "Unable to save this article." }, { status: 500 }); }
 }

@@ -1,10 +1,8 @@
 import { eq } from "drizzle-orm";
-import { getChatGPTUser } from "../../../../chatgpt-auth";
 import { getDb } from "../../../../../db";
 import { posts } from "../../../../../db/schema";
 
 export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await getChatGPTUser())) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   const body = (await request.json()) as { status?: string };
   if (body.status !== "draft" && body.status !== "published") return Response.json({ error: "Invalid status" }, { status: 400 });
@@ -16,7 +14,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!(await getChatGPTUser())) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { id } = await params;
   await getDb().delete(posts).where(eq(posts.id, Number(id)));
   return Response.json({ ok: true });
