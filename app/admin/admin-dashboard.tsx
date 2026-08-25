@@ -72,7 +72,7 @@ export function AdminDashboard({ name }: { name: string }) {
         ) : (
           <div className="admin-list">
             <div className="admin-list-heading"><p>Articles</p><a href="/writing/new">New article ＋</a></div>
-            {posts.length ? posts.map((post) => <article className="post-row" key={post.id}><span className={`status-pill ${post.status}`}>{post.status}</span><div><p>{formatDate(post.updatedAt)}</p><h2>{post.title}</h2><p>{post.excerpt}</p></div><div className="row-actions"><a href={post.status === "published" ? `/writing/${post.slug}` : "/writing/new"}>{post.status === "published" ? "View" : "New draft"}</a><button onClick={() => togglePost(post)}>{post.status === "published" ? "Unpublish" : "Publish"}</button><button className="danger" onClick={() => deletePost(post.id)}>Delete</button></div></article>) : <p className="admin-empty">No articles yet. <a href="/writing/new">Write the first one.</a></p>}
+            {posts.length ? posts.map((post) => <article className="post-row" key={post.id}><span className={`status-pill ${post.status}`}>{post.status}</span><div><p>{formatDate(post.updatedAt)}</p><h2>{post.title}</h2><p>{post.excerpt}</p></div><div className="row-actions"><a href={`/writing/edit/${post.id}`}>Edit</a>{post.status === "published" ? <a href={`/writing/${post.slug}`}>View</a> : null}<button onClick={() => togglePost(post)}>{post.status === "published" ? "Unpublish" : "Publish"}</button><button className="danger" onClick={() => deletePost(post.id)}>Delete</button></div></article>) : <p className="admin-empty">No articles yet. <a href="/writing/new">Write the first one.</a></p>}
           </div>
         )}
       </section>

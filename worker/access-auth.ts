@@ -46,15 +46,15 @@ export function ownerProtectionForRequest(request: Request): "page" | "api" | nu
     normalizedPath.startsWith("/admin/") ||
     normalizedPath === "/writing/new" ||
     normalizedPath.startsWith("/writing/new/") ||
-    /^\/writing\/[^/]+\/edit(?:\/.*)?$/.test(normalizedPath)
+    normalizedPath === "/writing/edit" ||
+    normalizedPath.startsWith("/writing/edit/")
   ) {
     return "page";
   }
 
   if (
     normalizedPath === "/api/admin" ||
-    normalizedPath.startsWith("/api/admin/") ||
-    (normalizedPath === "/api/posts" && request.method.toUpperCase() === "POST")
+    normalizedPath.startsWith("/api/admin/")
   ) {
     return "api";
   }

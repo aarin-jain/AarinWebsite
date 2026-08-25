@@ -34,14 +34,18 @@ test("identifies every current owner-only route without blocking public reads", 
     ["GET", "/admin", "page"],
     ["GET", "/admin/", "page"],
     ["GET", "/writing/new", "page"],
-    ["GET", "/writing/42/edit", "page"],
+    ["GET", "/writing/edit/42", "page"],
     ["GET", "/api/admin/posts", "api"],
+    ["POST", "/api/admin/posts", "api"],
     ["PATCH", "/api/admin/posts/42", "api"],
-    ["POST", "/api/posts", "api"],
+    ["DELETE", "/api/admin/posts/42", "api"],
+    ["PATCH", "/api/admin/messages/42", "api"],
+    ["DELETE", "/api/admin/messages/42", "api"],
     ["GET", "/", null],
     ["GET", "/writing", null],
     ["GET", "/writing/an-article", null],
     ["GET", "/api/posts", null],
+    ["POST", "/api/posts", null],
     ["POST", "/api/contact", null],
   ];
 
@@ -61,10 +65,10 @@ test("accepts a valid owner token from the Access assertion header", async () =>
   assert.deepEqual(result, { ok: true, identity: { email: "aarinj@gmail.com", subject: "owner-123" } });
 });
 
-test("accepts the signed Access cookie for the temporary post endpoint", async () => {
+test("accepts the signed Access cookie for an owner API endpoint", async () => {
   const token = await signToken();
   const result = await verifyAccessRequest(
-    new Request("https://example.com/api/posts", { method: "POST", headers: { cookie: `other=value; CF_Authorization=${token}` } }),
+    new Request("https://example.com/api/admin/posts", { method: "POST", headers: { cookie: `other=value; CF_Authorization=${token}` } }),
     config,
     { fetcher: jwksFetch(), nowSeconds: now },
   );

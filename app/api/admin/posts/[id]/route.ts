@@ -43,7 +43,11 @@ export async function DELETE(_request: Request, { params }: RouteContext) {
   const id = parsePostId((await params).id);
   if (id === null) return Response.json({ error: "Invalid post ID." }, { status: 400 });
 
-  const [deleted] = await getDb().delete(posts).where(eq(posts.id, id)).returning({ id: posts.id });
-  if (!deleted) return Response.json({ error: "Post not found." }, { status: 404 });
-  return Response.json({ ok: true });
+  try {
+    const [deleted] = await getDb().delete(posts).where(eq(posts.id, id)).returning({ id: posts.id });
+    if (!deleted) return Response.json({ error: "Post not found." }, { status: 404 });
+    return Response.json({ ok: true });
+  } catch {
+    return Response.json({ error: "Unable to delete this article." }, { status: 500 });
+  }
 }
