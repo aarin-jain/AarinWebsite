@@ -95,6 +95,7 @@ export function Portfolio() {
           <a href="#work" onClick={() => setMenuOpen(false)}>Work</a>
           <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
           <a href="/writing" onClick={() => setMenuOpen(false)}>Writing</a>
+          <a href="/listening" onClick={() => setMenuOpen(false)}>Listening</a>
           <a href="/play" onClick={() => setMenuOpen(false)}>Play</a>
           <a href="#contact" onClick={() => setMenuOpen(false)}>Contact</a>
         </div>
