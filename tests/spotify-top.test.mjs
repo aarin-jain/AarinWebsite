@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
 import { getSpotifyTopItems, isSpotifyRange } from "../services/spotify.ts";
 
@@ -22,4 +23,11 @@ test("loads and maps five top tracks and artists using one refreshed token", asy
   assert.match(urls[1], /time_range=short_term&limit=5/);
   assert.deepEqual(result.tracks[0], { id: "t1", name: "Track", detail: "Artist", imageUrl: "track.jpg", spotifyUrl: "track-url" });
   assert.deepEqual(result.artists[0], { id: "a1", name: "Artist", detail: "indie · rock", imageUrl: "artist.jpg", spotifyUrl: "artist-url" });
+});
+
+test("uses document links for reliable listening-page navigation on Vinext", () => {
+  const source = readFileSync(new URL("../app/listening/listening-dashboard.tsx", import.meta.url), "utf8");
+  assert.doesNotMatch(source, /from ["']next\/link["']/);
+  assert.match(source, /<a className="brand" href="\/"/);
+  assert.match(source, /<a href="\/writing">Writing<\/a>/);
 });

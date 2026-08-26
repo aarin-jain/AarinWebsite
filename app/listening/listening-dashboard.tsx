@@ -1,7 +1,7 @@
 "use client";
+/* eslint-disable @next/next/no-html-link-for-pages -- Vinext production navigation requires document links. */
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import type { SpotifyRange, SpotifyTopItems } from "../../services/spotify";
 
 const ranges: Array<{ value: SpotifyRange; label: string }> = [
@@ -25,8 +25,8 @@ export function ListeningDashboard() {
   return (
     <main className="listening-page">
       <nav className="nav shell" aria-label="Listening navigation">
-        <Link className="brand" href="/" aria-label="Aarin Jain, home">AJ<span>.</span></Link>
-        <div className="nav-links writing-nav"><Link href="/">Portfolio</Link><Link href="/writing">Writing</Link><Link href="/listening" aria-current="page">Listening</Link></div>
+        <a className="brand" href="/" aria-label="Aarin Jain, home">AJ<span>.</span></a>
+        <div className="nav-links writing-nav"><a href="/">Portfolio</a><a href="/writing">Writing</a><a href="/listening" aria-current="page">Listening</a></div>
         <a className="availability" href="https://open.spotify.com/" target="_blank" rel="noreferrer"><i /> Open Spotify</a>
       </nav>
       <header className="listening-hero shell">
@@ -42,7 +42,7 @@ export function ListeningDashboard() {
           <Ranking title="Top artists" japanese="音楽家" items={data.artists} />
         </>}
       </section>
-      <footer className="shell"><Link className="brand" href="/">AJ<span>.</span></Link><p>Listening data from Spotify.</p><div><Link href="/">Portfolio</Link><a href="https://open.spotify.com/" target="_blank" rel="noreferrer">Spotify ↗</a></div></footer>
+      <footer className="shell"><a className="brand" href="/">AJ<span>.</span></a><p>Listening data from Spotify.</p><div><a href="/">Portfolio</a><a href="https://open.spotify.com/" target="_blank" rel="noreferrer">Spotify ↗</a></div></footer>
     </main>
   );
 }
