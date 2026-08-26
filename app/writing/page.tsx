@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { desc, eq } from "drizzle-orm";
 import { getDb } from "../../db";
 import { posts } from "../../db/schema";
+import { ArticleLikeButton } from "./article-like-button";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -36,11 +37,14 @@ export default async function WritingPage() {
 
       <section className="article-index shell" aria-label="Articles">
         {articles.length ? articles.map((article, index) => (
-          <a className="article-row" href={`/writing/${article.slug}`} key={article.id}>
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <div><p>{formatDate(article.publishedAt)}</p><h2>{article.title}</h2><p>{article.excerpt}</p></div>
-            <b aria-hidden="true">↗</b>
-          </a>
+          <article className="article-row" key={article.id}>
+            <a className="article-row-link" href={`/writing/${article.slug}`}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div><p>{formatDate(article.publishedAt)}</p><h2>{article.title}</h2><p>{article.excerpt}</p></div>
+              <b aria-hidden="true">↗</b>
+            </a>
+            <div className="article-row-like"><ArticleLikeButton slug={article.slug} compact /></div>
+          </article>
         )) : (
           <div className="empty-writing"><span>余白</span><h2>The first page is still blank.</h2><p>Aarin’s first note will appear here when it’s ready.</p><a href="/writing/new">Write the first post ↗</a></div>
         )}

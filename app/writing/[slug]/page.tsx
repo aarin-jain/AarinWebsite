@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { getDb } from "../../../db";
 import { posts } from "../../../db/schema";
 import { ArticleEngagement } from "./article-engagement";
+import { ArticleLikeButton } from "../article-like-button";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     <main className="article-page">
       <nav className="nav shell"><a className="brand" href="/">AJ<span>.</span></a><a className="back-writing" href="/writing">← All writing</a></nav>
       <article>
-        <header><p className="eyebrow">Essay · {formatDate(post.publishedAt)}</p><h1>{post.title}</h1><p>{post.excerpt}</p></header>
+        <header><p className="eyebrow">Essay · {formatDate(post.publishedAt)}</p><h1>{post.title}</h1><p>{post.excerpt}</p><div className="article-header-like"><ArticleLikeButton slug={slug} /></div></header>
         <div className="article-body">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
       </article>
       <ArticleEngagement slug={slug} />

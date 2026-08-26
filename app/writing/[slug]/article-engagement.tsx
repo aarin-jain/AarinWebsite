@@ -6,37 +6,21 @@ type Reaction = "like" | "dislike" | null;
 type PublicComment = { id: string; parentId: string | null; name: string; body: string; createdAt: string; likes: number; dislikes: number; reaction: Reaction };
 
 export function ArticleEngagement({ slug }: { slug: string }) {
-  const [like, setLike] = useState({ count: 0, liked: false });
   const [comments, setComments] = useState<PublicComment[]>([]);
   const [commentsEnabled, setCommentsEnabled] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [likeSaving, setLikeSaving] = useState(false);
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [commentSaving, setCommentSaving] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    Promise.all([fetch(`/api/posts/${slug}/likes`), fetch(`/api/posts/${slug}/comments`)])
-      .then(async ([likeResponse, commentResponse]) => {
-        if (likeResponse.ok) setLike(await likeResponse.json());
+    fetch(`/api/posts/${slug}/comments`)
+      .then(async (commentResponse) => {
         if (commentResponse.ok) {
           const value = await commentResponse.json() as { enabled: boolean; comments: PublicComment[] };
           setCommentsEnabled(value.enabled); setComments(value.comments);
         }
-      })
-      .finally(() => setLoading(false));
+      });
   }, [slug]);
-
-  async function toggleLike() {
-    setLikeSaving(true); setMessage("");
-    try {
-      const response = await fetch(`/api/posts/${slug}/likes`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ liked: !like.liked }) });
-      const result = await response.json() as { count?: number; liked?: boolean; error?: string };
-      if (!response.ok || result.count === undefined || result.liked === undefined) throw new Error(result.error);
-      setLike({ count: result.count, liked: result.liked });
-    } catch { setMessage("Your like was not saved. Please try again."); }
-    finally { setLikeSaving(false); }
-  }
 
   async function submitComment(event: FormEvent<HTMLFormElement>, parentId: string | null) {
     event.preventDefault();
@@ -65,7 +49,6 @@ export function ArticleEngagement({ slug }: { slug: string }) {
   const roots = comments.filter((comment) => !comment.parentId || !comments.some((candidate) => candidate.id === comment.parentId));
 
   return <section className="engagement shell" aria-label="Article discussion">
-    <div className="article-like"><button type="button" aria-pressed={like.liked} disabled={likeSaving || loading} onClick={toggleLike}><span aria-hidden="true">{like.liked ? "♥" : "♡"}</span><strong>{like.count}</strong><small>{like.liked ? "Liked" : "Like"}</small></button></div>
     <div className="discussion">
       <header><h2>Comments</h2><span>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span></header>
       {!commentsEnabled ? <p className="comments-closed">Comments are closed for this article.</p> : <>
