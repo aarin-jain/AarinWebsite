@@ -37,7 +37,7 @@ export async function POST(request: Request, { params }: Context) {
       parentId = parent.id;
     }
     const publicId = `c_${crypto.randomUUID().replace(/-/g, "")}`;
-    await getDb().insert(articleComments).values({ publicId, postId: post.id, parentId, name: normalized.value.name, email: normalized.value.email, body: normalized.value.body });
+    await getDb().insert(articleComments).values({ publicId, postId: post.id, parentId, name: normalized.value.name, email: "", body: normalized.value.body });
     const comments = await publicComments(post.id, identity.hash);
     return withReaderCookie(Response.json({ enabled: true, comments, createdId: publicId }, { status: 201 }), identity.setCookie);
   } catch { return Response.json({ error: "Unable to publish your comment." }, { status: 500 }); }

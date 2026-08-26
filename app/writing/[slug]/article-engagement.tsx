@@ -65,9 +65,9 @@ export function ArticleEngagement({ slug }: { slug: string }) {
   const roots = comments.filter((comment) => !comment.parentId || !comments.some((candidate) => candidate.id === comment.parentId));
 
   return <section className="engagement shell" aria-label="Article discussion">
-    <div className="article-like"><div><p className="eyebrow">Appreciation · 共感</p><h2>Did this resonate?</h2></div><button type="button" aria-pressed={like.liked} disabled={likeSaving || loading} onClick={toggleLike}><span aria-hidden="true">{like.liked ? "♥" : "♡"}</span><strong>{like.count}</strong><small>{like.liked ? "Liked" : "Like"}</small></button></div>
+    <div className="article-like"><button type="button" aria-pressed={like.liked} disabled={likeSaving || loading} onClick={toggleLike}><span aria-hidden="true">{like.liked ? "♥" : "♡"}</span><strong>{like.count}</strong><small>{like.liked ? "Liked" : "Like"}</small></button></div>
     <div className="discussion">
-      <header><div><p className="eyebrow">Discussion · 対話</p><h2>Responses</h2></div><span>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span></header>
+      <header><h2>Comments</h2><span>{comments.length} {comments.length === 1 ? "comment" : "comments"}</span></header>
       {!commentsEnabled ? <p className="comments-closed">Comments are closed for this article.</p> : <>
         <CommentForm onSubmit={(event) => submitComment(event, null)} saving={commentSaving === "root"} />
         <div className="comment-list">{roots.length ? roots.map((comment) => <CommentNode key={comment.id} comment={comment} all={comments} replyTo={replyTo} setReplyTo={setReplyTo} react={react} submitComment={submitComment} saving={commentSaving} depth={0} />) : <p className="comments-empty">No comments yet. Start the conversation.</p>}</div>
@@ -87,9 +87,11 @@ function CommentNode({ comment, all, replyTo, setReplyTo, react, submitComment, 
 }
 
 function CommentForm({ onSubmit, saving, compact = false }: { onSubmit: (event: FormEvent<HTMLFormElement>) => void; saving: boolean; compact?: boolean }) {
+  const [anonymous, setAnonymous] = useState(true);
   return <form className={`comment-form ${compact ? "compact" : ""}`} onSubmit={onSubmit}>
-    {!compact ? <p>Your email stays private. Comments publish immediately.</p> : <p>Reply to this thread.</p>}
-    <div><label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" /></label><label>Email<input name="email" type="email" required maxLength={254} autoComplete="email" /></label></div>
+    {!compact ? <p>Comments publish immediately.</p> : <p>Reply to this thread.</p>}
+    <label className="anonymous-setting"><input type="checkbox" checked={anonymous} onChange={(event) => setAnonymous(event.target.checked)} /><span>Post anonymously</span></label>
+    {!anonymous ? <label>Name<input name="name" required minLength={2} maxLength={80} autoComplete="name" placeholder="Your name" /></label> : null}
     <label>Comment<textarea name="body" required minLength={3} maxLength={2000} rows={compact ? 3 : 4} /></label>
     <label className="comment-honeypot" aria-hidden="true">Website<input name="website" tabIndex={-1} autoComplete="off" /></label>
     <button type="submit" disabled={saving}>{saving ? "Publishing…" : compact ? "Post reply ↗" : "Post comment ↗"}</button>

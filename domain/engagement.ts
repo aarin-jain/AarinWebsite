@@ -1,18 +1,16 @@
-export type CommentInput = { name?: unknown; email?: unknown; body?: unknown; parentId?: unknown; website?: unknown };
+export type CommentInput = { name?: unknown; body?: unknown; parentId?: unknown; website?: unknown };
 export type Reaction = "like" | "dislike";
 export type ValidationResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
-export function normalizeCommentInput(input: CommentInput): ValidationResult<{ name: string; email: string; body: string; parentId: string | null }> {
+export function normalizeCommentInput(input: CommentInput): ValidationResult<{ name: string; body: string; parentId: string | null }> {
   if (typeof input.website === "string" && input.website.trim()) return invalid("Comment could not be submitted.");
-  const name = text(input.name);
-  const email = text(input.email).toLowerCase();
+  const name = text(input.name) || "Anonymous";
   const body = text(input.body);
   const parentId = input.parentId === undefined || input.parentId === null || input.parentId === "" ? null : text(input.parentId);
-  if (name.length < 2 || name.length > 80) return invalid("Name must be between 2 and 80 characters.");
-  if (email.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return invalid("Enter a valid email address.");
+  if (name.length < 2 || name.length > 80) return invalid("Name must be between 2 and 80 characters when provided.");
   if (body.length < 3 || body.length > 2_000) return invalid("Comment must be between 3 and 2,000 characters.");
   if (parentId !== null && !isPublicCommentId(parentId)) return invalid("Reply target is invalid.");
-  return { ok: true, value: { name, email, body, parentId } };
+  return { ok: true, value: { name, body, parentId } };
 }
 
 export function isPublicCommentId(value: string): boolean {

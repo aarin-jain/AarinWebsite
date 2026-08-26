@@ -89,7 +89,7 @@ export function AdminDashboard({ name }: { name: string }) {
         ) : (
           <div className="admin-list">
             <div className="admin-list-heading"><p>Published comments</p><span>{comments.length} total</span></div>
-            {comments.length ? comments.map((comment) => <article className="comment-admin-card" key={comment.id}><div><span>{comment.parentId ? "Reply" : "Comment"}</span><a href={`/writing/${comment.postSlug}`}>{comment.postTitle} ↗</a></div><div><h2>{comment.name}</h2><a href={`mailto:${comment.email}`}>{comment.email}</a><time>{formatDate(comment.createdAt)}</time></div><p>{comment.body}</p><button className="danger" onClick={() => deleteComment(comment.id)}>Delete</button></article>) : <p className="admin-empty">No comments yet.</p>}
+            {comments.length ? comments.map((comment) => <article className="comment-admin-card" key={comment.id}><div><span>{comment.parentId ? "Reply" : "Comment"}</span><a href={`/writing/${comment.postSlug}`}>{comment.postTitle} ↗</a></div><div><h2>{comment.name}</h2>{comment.email ? <a href={`mailto:${comment.email}`}>{comment.email}</a> : null}<time>{formatDate(comment.createdAt)}</time></div><p>{comment.body}</p><button className="danger" onClick={() => deleteComment(comment.id)}>Delete</button></article>) : <p className="admin-empty">No comments yet.</p>}
           </div>
         )}
       </section>

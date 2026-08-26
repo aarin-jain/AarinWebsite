@@ -3,20 +3,26 @@ import test from "node:test";
 import { normalizeCommentInput, normalizeLikeAction, normalizeReaction } from "../domain/engagement.ts";
 import { readerIdentity, withReaderCookie } from "../services/reader-identity.ts";
 
-test("normalizes valid comments and keeps email private-ready", () => {
-  assert.deepEqual(normalizeCommentInput({ name: "  Aarin  ", email: " AARIN@EXAMPLE.COM ", body: "  Thoughtful   response. ", parentId: "c_1234567890abcdef" }), {
+test("normalizes valid comments without requiring an email", () => {
+  assert.deepEqual(normalizeCommentInput({ name: "  Aarin  ", body: "  Thoughtful   response. ", parentId: "c_1234567890abcdef" }), {
     ok: true,
-    value: { name: "Aarin", email: "aarin@example.com", body: "Thoughtful response.", parentId: "c_1234567890abcdef" },
+    value: { name: "Aarin", body: "Thoughtful response.", parentId: "c_1234567890abcdef" },
+  });
+});
+
+test("defaults a missing commenter name to Anonymous", () => {
+  assert.deepEqual(normalizeCommentInput({ body: "A comment without a name." }), {
+    ok: true,
+    value: { name: "Anonymous", body: "A comment without a name.", parentId: null },
   });
 });
 
 test("rejects invalid comments, honeypots, and reply targets", () => {
   const cases = [
-    { name: "A", email: "a@example.com", body: "Valid body" },
-    { name: "Aarin", email: "invalid", body: "Valid body" },
-    { name: "Aarin", email: "a@example.com", body: "no" },
-    { name: "Aarin", email: "a@example.com", body: "Valid body", parentId: "42" },
-    { name: "Aarin", email: "a@example.com", body: "Valid body", website: "spam.example" },
+    { name: "A", body: "Valid body" },
+    { name: "Aarin", body: "no" },
+    { name: "Aarin", body: "Valid body", parentId: "42" },
+    { name: "Aarin", body: "Valid body", website: "spam.example" },
   ];
   for (const input of cases) assert.equal(normalizeCommentInput(input).ok, false);
 });
