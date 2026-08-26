@@ -30,13 +30,17 @@ export function NowPlayingBanner() {
       ? { label: "Spotify", title: "Between songs", detail: "Check back soon", art: null }
       : { label: "Spotify", title: "Listening status unavailable", detail: "Connection pending", art: null };
 
-  const groups = [0, 1].map((copy) => (
-    <span className="now-playing-group" aria-hidden="true" key={copy}>
-      {/* Spotify artwork URLs are dynamic and cannot be predeclared for framework image optimization. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      {content.art ? <img src={content.art} alt="" /> : <span className="now-playing-mark">♪</span>}
-      <span className="now-playing-label"><i /><b>{content.label}</b></span>
-      <strong>{content.title}</strong><span className="now-playing-dot">●</span><span>{content.detail}</span><span className="now-playing-arrow">↗</span>
+  const groups = [0, 1].map((group) => (
+    <span className="now-playing-group" aria-hidden="true" key={group}>
+      {[0, 1].map((copy) => (
+        <span className="now-playing-segment" key={copy}>
+          {/* Spotify artwork URLs are dynamic and cannot be predeclared for framework image optimization. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          {content.art ? <img src={content.art} alt="" /> : <span className="now-playing-mark">♪</span>}
+          <span className="now-playing-label"><i /><b>{content.label}</b></span>
+          <strong>{content.title}</strong><span className="now-playing-dot">●</span><span>{content.detail}</span><span className="now-playing-arrow">↗</span>
+        </span>
+      ))}
     </span>
   ));
 
