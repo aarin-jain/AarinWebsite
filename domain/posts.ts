@@ -5,6 +5,7 @@ export type PostMutationInput = {
   excerpt?: unknown;
   content?: unknown;
   status?: unknown;
+  commentsEnabled?: unknown;
 };
 
 export type NormalizedPostInput = {
@@ -12,6 +13,7 @@ export type NormalizedPostInput = {
   excerpt: string;
   content: string;
   status: PostStatus;
+  commentsEnabled: boolean;
 };
 
 export type ExistingPostForUpdate = NormalizedPostInput & {
@@ -56,8 +58,10 @@ export function normalizeNewPostInput(input: PostMutationInput): PostInputResult
 
   const status = input.status === undefined ? "draft" : input.status;
   if (!isPostStatus(status)) return invalid("Status must be draft or published.");
+  const commentsEnabled = input.commentsEnabled === undefined ? true : input.commentsEnabled;
+  if (typeof commentsEnabled !== "boolean") return invalid("Comments enabled must be true or false.");
 
-  return { ok: true, value: { title, excerpt, content, status } };
+  return { ok: true, value: { title, excerpt, content, status, commentsEnabled } };
 }
 
 export function buildPostUpdate(
@@ -72,6 +76,7 @@ export function buildPostUpdate(
     excerpt: input.excerpt === undefined ? existing.excerpt : input.excerpt,
     content: input.content === undefined ? existing.content : input.content,
     status: input.status === undefined ? existing.status : input.status,
+    commentsEnabled: input.commentsEnabled === undefined ? existing.commentsEnabled : input.commentsEnabled,
   };
   const normalized = normalizeNewPostInput(candidate);
   if (!normalized.ok) return normalized;
@@ -110,7 +115,7 @@ function isPostStatus(value: unknown): value is PostStatus {
 }
 
 function hasEditableField(input: PostMutationInput): boolean {
-  return input.title !== undefined || input.excerpt !== undefined || input.content !== undefined || input.status !== undefined;
+  return input.title !== undefined || input.excerpt !== undefined || input.content !== undefined || input.status !== undefined || input.commentsEnabled !== undefined;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

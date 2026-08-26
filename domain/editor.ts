@@ -5,6 +5,7 @@ export type EditorPost = {
   excerpt: string;
   content: string;
   status: "draft" | "published";
+  commentsEnabled: boolean;
 };
 
 export function editorSaveRequest(postId: number | null): { endpoint: string; method: "POST" | "PATCH" } {

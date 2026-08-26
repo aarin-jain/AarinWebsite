@@ -3,6 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { getDb } from "../../../db";
 import { posts } from "../../../db/schema";
+import { ArticleEngagement } from "./article-engagement";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <header><p className="eyebrow">Essay · {formatDate(post.publishedAt)}</p><h1>{post.title}</h1><p>{post.excerpt}</p></header>
         <div className="article-body">{paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>
       </article>
+      <ArticleEngagement slug={slug} />
       <aside className="article-end shell"><span>終</span><div><p>Thanks for reading.</p><a href="/writing">More notes ↗</a></div></aside>
     </main>
   );

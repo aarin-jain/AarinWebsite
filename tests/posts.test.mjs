@@ -15,6 +15,7 @@ const existingDraft = {
   excerpt: "Existing description",
   content: "Existing article content that is comfortably over forty characters.",
   status: "draft",
+  commentsEnabled: true,
   publishedAt: null,
 };
 
@@ -32,6 +33,7 @@ test("normalizes a new post and defaults its status to draft", () => {
       excerpt: "A useful description.",
       content: "Article content that is comfortably longer than forty characters.",
       status: "draft",
+      commentsEnabled: true,
     },
   });
 });

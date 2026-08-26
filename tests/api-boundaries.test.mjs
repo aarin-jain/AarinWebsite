@@ -19,3 +19,16 @@ test("keeps public posts read-only and moves creation behind the admin boundary"
   assert.doesNotMatch(editorSource, /fetch\(["']\/api\/posts["']/);
   assert.match(editorSource, /editorSaveRequest/);
 });
+
+test("keeps comment deletion owner-only while public engagement remains narrowly scoped", async () => {
+  const [likes, comments, reactions, adminDelete] = await Promise.all([
+    readFile(new URL("../app/api/posts/[slug]/likes/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/posts/[slug]/comments/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/posts/[slug]/comments/[commentId]/reaction/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/admin/comments/[id]/route.ts", import.meta.url), "utf8"),
+  ]);
+  for (const source of [likes, comments, reactions]) assert.doesNotMatch(source, /export async function DELETE/);
+  assert.match(adminDelete, /export async function DELETE/);
+  assert.match(comments, /post\.commentsEnabled/);
+  assert.match(likes, /articleLikes.*onConflictDoNothing/s);
+});

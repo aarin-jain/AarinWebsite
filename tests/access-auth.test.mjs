@@ -41,12 +41,17 @@ test("identifies every current owner-only route without blocking public reads", 
     ["DELETE", "/api/admin/posts/42", "api"],
     ["PATCH", "/api/admin/messages/42", "api"],
     ["DELETE", "/api/admin/messages/42", "api"],
+    ["GET", "/api/admin/comments", "api"],
+    ["DELETE", "/api/admin/comments/42", "api"],
     ["GET", "/", null],
     ["GET", "/writing", null],
     ["GET", "/writing/an-article", null],
     ["GET", "/api/posts", null],
     ["POST", "/api/posts", null],
     ["POST", "/api/contact", null],
+    ["GET", "/api/posts/an-article/likes", null],
+    ["POST", "/api/posts/an-article/comments", null],
+    ["POST", "/api/posts/an-article/comments/c_1234567890abcdef/reaction", null],
   ];
 
   for (const [method, pathname, expected] of cases) {

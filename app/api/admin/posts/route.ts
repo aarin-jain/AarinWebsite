@@ -1,11 +1,17 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { getDb } from "../../../../db";
 import { posts } from "../../../../db/schema";
 import { isUniqueConstraintError, normalizeNewPostInput, readPostMutationInput } from "../../../../domain/posts";
 
 export async function GET() {
   try {
-    const rows = await getDb().select().from(posts).orderBy(desc(posts.updatedAt), desc(posts.id));
+    const rows = await getDb().select({
+      id: posts.id, title: posts.title, slug: posts.slug, excerpt: posts.excerpt, content: posts.content,
+      status: posts.status, authorId: posts.authorId, publishedAt: posts.publishedAt, createdAt: posts.createdAt,
+      updatedAt: posts.updatedAt, commentsEnabled: posts.commentsEnabled,
+      likeCount: sql<number>`(SELECT COUNT(*) FROM article_likes WHERE article_likes.post_id = ${posts.id})`,
+      commentCount: sql<number>`(SELECT COUNT(*) FROM article_comments WHERE article_comments.post_id = ${posts.id})`,
+    }).from(posts).orderBy(desc(posts.updatedAt), desc(posts.id));
     return Response.json({ posts: rows });
   } catch { return Response.json({ error: "Unable to load posts." }, { status: 500 }); }
 }
@@ -17,7 +23,7 @@ export async function POST(request: Request) {
     const normalized = normalizeNewPostInput(body.value);
     if (!normalized.ok) return Response.json({ error: normalized.error }, { status: 400 });
 
-    const { title, excerpt, content, status } = normalized.value;
+    const { title, excerpt, content, status, commentsEnabled } = normalized.value;
     const slug = await uniqueSlug(title);
     const now = new Date().toISOString();
     const [post] = await getDb().insert(posts).values({
@@ -29,6 +35,7 @@ export async function POST(request: Request) {
       authorId: "aarin",
       publishedAt: status === "published" ? now : null,
       updatedAt: now,
+      commentsEnabled,
     }).returning();
     return Response.json({ post }, { status: 201 });
   } catch (error) {

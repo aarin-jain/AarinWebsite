@@ -1,5 +1,5 @@
 import { sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, uniqueIndex, index } from "drizzle-orm/sqlite-core";
 
 export const contactMessages = sqliteTable("contact_messages", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -21,4 +21,38 @@ export const posts = sqliteTable("posts", {
   publishedAt: text("published_at"),
   createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  commentsEnabled: integer("comments_enabled", { mode: "boolean" }).notNull().default(true),
+});
+
+export const articleLikes = sqliteTable("article_likes", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  postId: integer("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }),
+  visitorHash: text("visitor_hash").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [uniqueIndex("article_likes_post_visitor_unique").on(table.postId, table.visitorHash)]);
+
+export const articleComments = sqliteTable("article_comments", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  publicId: text("public_id").notNull().unique(),
+  postId: integer("post_id").notNull().references(() => posts.id, { onDelete: "cascade" }),
+  parentId: integer("parent_id"),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  body: text("body").notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [index("idx_article_comments_post_created").on(table.postId, table.createdAt)]);
+
+export const commentReactions = sqliteTable("comment_reactions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  commentId: integer("comment_id").notNull().references(() => articleComments.id, { onDelete: "cascade" }),
+  visitorHash: text("visitor_hash").notNull(),
+  reaction: text("reaction", { enum: ["like", "dislike"] }).notNull(),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [uniqueIndex("comment_reactions_comment_visitor_unique").on(table.commentId, table.visitorHash)]);
+
+export const engagementRateLimits = sqliteTable("engagement_rate_limits", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull(),
+  expiresAt: text("expires_at").notNull(),
 });

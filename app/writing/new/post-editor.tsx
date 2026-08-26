@@ -3,9 +3,9 @@
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { articleParagraphs, editorPath, editorSaveRequest, type EditorPost } from "../../../domain/editor";
 
-type EditorValues = Pick<EditorPost, "title" | "excerpt" | "content" | "status">;
+type EditorValues = Pick<EditorPost, "title" | "excerpt" | "content" | "status" | "commentsEnabled">;
 
-const blankPost: EditorValues = { title: "", excerpt: "", content: "", status: "draft" };
+const blankPost: EditorValues = { title: "", excerpt: "", content: "", status: "draft", commentsEnabled: true };
 
 export function PostEditor({ authorName, initialPost = null }: { authorName: string; initialPost?: EditorPost | null }) {
   const [values, setValues] = useState<EditorValues>(() => initialPost ?? blankPost);
@@ -52,7 +52,7 @@ export function PostEditor({ authorName, initialPost = null }: { authorName: str
         return;
       }
 
-      setValues({ title: result.post.title, excerpt: result.post.excerpt, content: result.post.content, status: result.post.status });
+      setValues({ title: result.post.title, excerpt: result.post.excerpt, content: result.post.content, status: result.post.status, commentsEnabled: result.post.commentsEnabled });
       setDirty(false);
       if (!editing) {
         allowNavigation.current = true;
@@ -79,6 +79,7 @@ export function PostEditor({ authorName, initialPost = null }: { authorName: str
           <label>Short description<textarea name="excerpt" required maxLength={240} rows={2} placeholder="One sentence that earns the next one." value={values.excerpt} onChange={(event) => change("excerpt", event.target.value)} /></label>
           <label>Article<textarea className="article-input" name="content" required minLength={40} maxLength={100000} rows={16} placeholder={'Write in plain text.\n\nLeave a blank line between paragraphs.'} value={values.content} onChange={(event) => change("content", event.target.value)} /></label>
           <label>Publication status<select name="status" value={values.status} onChange={(event) => change("status", event.target.value as EditorValues["status"])}><option value="draft">Save as draft</option><option value="published">Publish</option></select></label>
+          <label className="comments-setting"><input name="commentsEnabled" type="checkbox" checked={values.commentsEnabled} onChange={(event) => change("commentsEnabled", event.target.checked)} /><span><strong>Allow comments</strong><small>Readers can publish comments and replies on this article.</small></span></label>
           <div className="editor-actions">
             <button type="submit" disabled={status === "saving"}>{status === "saving" ? "Saving…" : editing ? "Save changes ↗" : "Save article ↗"}</button>
             <button className="preview-toggle" type="button" aria-pressed={previewOpen} onClick={() => setPreviewOpen((open) => !open)}>{previewOpen ? "Hide preview" : "Preview article"}</button>
