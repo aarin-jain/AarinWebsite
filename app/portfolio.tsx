@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { NowPlayingBanner } from "./now-playing-banner";
 
 const experience = [
   {
@@ -84,6 +85,7 @@ export function Portfolio() {
 
   return (
     <main>
+      <NowPlayingBanner />
       <nav className="nav shell" aria-label="Main navigation">
         <a className="brand" href="#top" aria-label="Aarin Jain, home">AJ<span>.</span></a>
         <button className="menu-button" onClick={() => setMenuOpen(!menuOpen)} aria-expanded={menuOpen} aria-controls="navigation-links">
