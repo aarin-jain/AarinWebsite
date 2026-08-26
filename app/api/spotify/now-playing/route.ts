@@ -1,7 +1,7 @@
 import { env } from "cloudflare:workers";
 import { getSpotifyNowPlaying, type NowPlaying } from "../../../../services/spotify";
 
-const CACHE_MS = 15_000;
+const CACHE_MS = 3_000;
 let cached: { expiresAt: number; value: NowPlaying } | undefined;
 let pending: Promise<NowPlaying> | undefined;
 
@@ -31,5 +31,5 @@ export async function GET() {
 }
 
 function response(value: NowPlaying) {
-  return Response.json(value, { headers: { "Cache-Control": "public, max-age=10, stale-while-revalidate=20" } });
+  return Response.json(value, { headers: { "Cache-Control": "public, max-age=2, stale-while-revalidate=3" } });
 }

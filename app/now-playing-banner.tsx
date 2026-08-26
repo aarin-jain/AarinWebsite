@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import type { NowPlaying } from "../services/spotify";
 
-const POLL_MS = 30_000;
+const POLL_MS = 7_000;
 
 export function NowPlayingBanner() {
   const [playing, setPlaying] = useState<NowPlaying>({ status: "unavailable" });
