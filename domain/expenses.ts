@@ -21,8 +21,8 @@ export function normalizeExpenseInput(value: unknown): { ok: true; value: Expens
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) return invalid("Choose a valid date.");
   if (description.length < 1 || description.length > 120) return invalid("Description must be between 1 and 120 characters.");
   if (!EXPENSE_CATEGORIES.includes(category as never)) return invalid("Choose a valid category.");
-  if (!EXPENSE_ACCOUNTS.includes(account as never)) return invalid("Choose a valid account.");
-  if (!EXPENSE_PAYMENT_METHODS.includes(paymentMethod as never)) return invalid("Choose a valid payment method.");
+  if (account && !EXPENSE_ACCOUNTS.includes(account as never)) return invalid("Choose a valid account.");
+  if (paymentMethod && !EXPENSE_PAYMENT_METHODS.includes(paymentMethod as never)) return invalid("Choose a valid payment method.");
   if (!EXPENSE_TYPES.includes(type as never)) return invalid("Choose a valid transaction type.");
   if (!Number.isFinite(amount) || amount <= 0 || amount > 10_000_000) return invalid("Amount must be greater than zero.");
   if (notes.length > 500) return invalid("Notes must be 500 characters or fewer.");

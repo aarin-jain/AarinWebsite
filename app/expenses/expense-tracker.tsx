@@ -5,11 +5,9 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 type Transaction = { id: number; date: string; description: string; category: string; account: string; paymentMethod: string; type: "expense" | "income"; amountCents: number; notes: string };
 type Budget = { category: string; monthlyCents: number };
-type ExpenseData = { transactions: Transaction[]; budgets: Budget[]; categories: string[]; accounts: string[]; paymentMethods: string[] };
+type ExpenseData = { transactions: Transaction[]; budgets: Budget[]; categories: string[] };
 const DEFAULT_CATEGORIES = ["Housing", "Utilities", "Groceries", "Dining", "Transportation", "Healthcare", "Subscriptions", "Entertainment", "Travel", "Other"];
-const DEFAULT_ACCOUNTS = ["Checking", "Credit Card", "Cash", "Venmo"];
-const DEFAULT_PAYMENTS = ["Credit", "Cash", "ACH/Transfer"];
-const EMPTY: ExpenseData = { transactions: [], budgets: [], categories: DEFAULT_CATEGORIES, accounts: DEFAULT_ACCOUNTS, paymentMethods: DEFAULT_PAYMENTS };
+const EMPTY: ExpenseData = { transactions: [], budgets: [], categories: DEFAULT_CATEGORIES };
 
 export function ExpenseTracker() {
   const [month, setMonth] = useState(currentMonth());
@@ -17,6 +15,7 @@ export function ExpenseTracker() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [budgetOpen, setBudgetOpen] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true); setMessage("");
@@ -24,7 +23,7 @@ export function ExpenseTracker() {
       const response = await fetch(`/api/expenses?month=${month}`);
       const result = await response.json() as ExpenseData & { error?: string };
       if (!response.ok) throw new Error(result.error);
-      setData({ ...result, categories: result.categories.length ? result.categories : DEFAULT_CATEGORIES, accounts: result.accounts.length ? result.accounts : DEFAULT_ACCOUNTS, paymentMethods: result.paymentMethods.length ? result.paymentMethods : DEFAULT_PAYMENTS });
+      setData({ transactions: result.transactions, budgets: result.budgets, categories: result.categories.length ? result.categories : DEFAULT_CATEGORIES });
     } catch { setMessage("Could not load your expenses."); }
     finally { setLoading(false); }
   }, [month]);
@@ -89,29 +88,27 @@ export function ExpenseTracker() {
           <label>Date <span>optional</span><input name="date" type="date" /></label>
           <label>Type<select name="type" defaultValue="expense"><option value="expense">Expense</option><option value="income">Income</option></select></label>
           <label>Category<select name="category">{data.categories.map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>Account<select name="account">{data.accounts.map((item) => <option key={item}>{item}</option>)}</select></label>
-          <label>Payment<select name="paymentMethod">{data.paymentMethods.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label className="wide">Notes <span>optional</span><input name="notes" maxLength={500} placeholder="Add context if useful" /></label>
           <button type="submit" disabled={saving}>{saving ? "Adding…" : "Add transaction ＋"}</button>
         </form>
         <p className="expense-message" role="status">{message}</p>
       </section>
 
-      <section className="budget-panel">
-        <header><div><p className="eyebrow">Monthly plan</p><h2>Budget</h2></div><span>Set each category</span></header>
-        <div className="budget-list">{data.categories.map((category) => {
+      <section className={`budget-panel${budgetOpen ? " open" : ""}`}>
+        <header><div><p className="eyebrow">Monthly plan</p><h2>Budget</h2></div><button type="button" aria-expanded={budgetOpen} aria-controls="budget-list" onClick={() => setBudgetOpen((open) => !open)}>{budgetOpen ? "Close" : "Set budget"}</button></header>
+        {budgetOpen ? <div className="budget-list" id="budget-list">{data.categories.map((category) => {
           const spent = data.transactions.filter((item) => item.type === "expense" && item.category === category).reduce((sum, item) => sum + item.amountCents, 0);
           const budget = data.budgets.find((item) => item.category === category)?.monthlyCents ?? 0;
           const ratio = budget ? Math.min(spent / budget * 100, 100) : 0;
           return <article key={category}><div><strong>{category}</strong><BudgetInput category={category} cents={budget} save={saveBudget} /></div><span className="budget-spent">{money(spent)} spent</span><i><b style={{ width: `${ratio}%` }} /></i></article>;
-        })}</div>
+        })}</div> : null}
       </section>
     </div>
 
     <section className="transaction-section shell">
       <header><div><p className="eyebrow">Ledger</p><h2>{monthLabel(month)}</h2></div><span>{data.transactions.length} {data.transactions.length === 1 ? "entry" : "entries"}</span></header>
       {loading ? <p className="expense-empty">Loading transactions…</p> : data.transactions.length ? <div className="transaction-list">{data.transactions.map((item) => <article key={item.id}>
-        <time>{shortDate(item.date)}</time><div><strong>{item.description}</strong><span>{item.category} · {item.account}</span>{item.notes ? <small>{item.notes}</small> : null}</div><b className={item.type}>{item.type === "income" ? "+" : item.type === "expense" ? "−" : ""}{money(item.amountCents)}</b><button onClick={() => deleteTransaction(item.id)} aria-label={`Delete ${item.description}`}>×</button>
+        <time>{shortDate(item.date)}</time><div><strong>{item.description}</strong><span>{item.category}</span>{item.notes ? <small>{item.notes}</small> : null}</div><b className={item.type}>{item.type === "income" ? "+" : item.type === "expense" ? "−" : ""}{money(item.amountCents)}</b><button onClick={() => deleteTransaction(item.id)} aria-label={`Delete ${item.description}`}>×</button>
       </article>)}</div> : <p className="expense-empty">No transactions this month. Add the first one above.</p>}
     </section>
   </main>;

@@ -21,6 +21,11 @@ test("defaults an omitted transaction date and rejects transfers", () => {
   assert.equal(normalizeExpenseInput({ ...valid, type: "transfer" }).ok, false);
 });
 
+test("accepts transactions without account or payment details", () => {
+  const { account, paymentMethod, ...input } = valid;
+  assert.deepEqual(normalizeExpenseInput(input), { ok: true, value: { date: "2026-09-05", description: "Coffee", category: "Dining", account: "", paymentMethod: "", type: "expense", amountCents: 475, notes: "Meeting" } });
+});
+
 test("accepts zero budgets and rejects unknown categories", () => {
   assert.deepEqual(normalizeBudgetInput({ category: "Housing", amount: "0" }), { ok: true, value: { category: "Housing", monthlyCents: 0 } });
   assert.equal(normalizeBudgetInput({ category: "Mystery", amount: 10 }).ok, false);

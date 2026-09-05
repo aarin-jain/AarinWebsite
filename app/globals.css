@@ -322,7 +322,11 @@ footer div { display:flex; gap:22px; }
 .expense-message { min-height:20px; margin:18px 0 0; color:#60615c; font-size:.76rem; }
 .budget-panel>header { display:flex; align-items:end; justify-content:space-between; }
 .budget-panel>header button { border:1px solid var(--line); border-radius:10px; background:transparent; padding:9px 13px; cursor:pointer; }
-.budget-panel>header>span { color:#777872; font:600 .58rem var(--font-geist-mono),monospace; text-transform:uppercase; letter-spacing:.08em; }
+.budget-panel>header button:hover { border-color:var(--orange); color:var(--orange); }
+.budget-panel:not(.open) { align-self:start; }
+.budget-panel:not(.open)>header { margin-bottom:0; }
+.budget-list { animation:budget-pop .34s cubic-bezier(.2,.8,.2,1); transform-origin:top; }
+@keyframes budget-pop { from { opacity:0; transform:translateY(-8px) scaleY(.97); } to { opacity:1; transform:none; } }
 .budget-list article { padding:13px 0; border-bottom:1px solid var(--line); }
 .budget-list article>div { display:flex; justify-content:space-between; align-items:center; gap:14px; font-size:.75rem; }
 .budget-list article>div>span { color:#73746e; }
