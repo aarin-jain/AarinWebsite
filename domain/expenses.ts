@@ -1,7 +1,7 @@
 export const EXPENSE_CATEGORIES = ["Housing", "Utilities", "Groceries", "Dining", "Transportation", "Healthcare", "Subscriptions", "Entertainment", "Travel", "Other"] as const;
 export const EXPENSE_ACCOUNTS = ["Checking", "Credit Card", "Cash", "Venmo"] as const;
 export const EXPENSE_PAYMENT_METHODS = ["Credit", "Cash", "ACH/Transfer"] as const;
-export const EXPENSE_TYPES = ["expense", "income", "transfer"] as const;
+export const EXPENSE_TYPES = ["expense", "income"] as const;
 
 type ExpenseType = typeof EXPENSE_TYPES[number];
 type ExpenseInput = { date: string; description: string; category: string; account: string; paymentMethod: string; type: ExpenseType; amountCents: number; notes: string };
@@ -9,7 +9,8 @@ type ExpenseInput = { date: string; description: string; category: string; accou
 export function normalizeExpenseInput(value: unknown): { ok: true; value: ExpenseInput } | { ok: false; error: string } {
   if (!value || typeof value !== "object" || Array.isArray(value)) return invalid("Enter the transaction details.");
   const input = value as Record<string, unknown>;
-  const date = typeof input.date === "string" ? input.date.trim() : "";
+  const suppliedDate = typeof input.date === "string" ? input.date.trim() : "";
+  const date = suppliedDate || localDate();
   const description = typeof input.description === "string" ? input.description.trim() : "";
   const category = typeof input.category === "string" ? input.category.trim() : "";
   const account = typeof input.account === "string" ? input.account.trim() : "";
@@ -44,3 +45,8 @@ export function normalizeBudgetInput(value: unknown): { ok: true; value: { categ
 }
 
 function invalid(error: string) { return { ok: false as const, error }; }
+
+function localDate() {
+  const value = new Date();
+  return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`;
+}

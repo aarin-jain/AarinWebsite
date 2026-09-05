@@ -14,6 +14,13 @@ test("rejects invalid expense fields and non-positive amounts", () => {
   }
 });
 
+test("defaults an omitted transaction date and rejects transfers", () => {
+  const result = normalizeExpenseInput({ ...valid, date: "" });
+  assert.equal(result.ok, true);
+  assert.match(result.value.date, /^\d{4}-\d{2}-\d{2}$/);
+  assert.equal(normalizeExpenseInput({ ...valid, type: "transfer" }).ok, false);
+});
+
 test("accepts zero budgets and rejects unknown categories", () => {
   assert.deepEqual(normalizeBudgetInput({ category: "Housing", amount: "0" }), { ok: true, value: { category: "Housing", monthlyCents: 0 } });
   assert.equal(normalizeBudgetInput({ category: "Mystery", amount: 10 }).ok, false);

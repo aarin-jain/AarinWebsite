@@ -3,17 +3,19 @@
 
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
-type Transaction = { id: number; date: string; description: string; category: string; account: string; paymentMethod: string; type: "expense" | "income" | "transfer"; amountCents: number; notes: string };
+type Transaction = { id: number; date: string; description: string; category: string; account: string; paymentMethod: string; type: "expense" | "income"; amountCents: number; notes: string };
 type Budget = { category: string; monthlyCents: number };
 type ExpenseData = { transactions: Transaction[]; budgets: Budget[]; categories: string[]; accounts: string[]; paymentMethods: string[] };
-const EMPTY: ExpenseData = { transactions: [], budgets: [], categories: [], accounts: [], paymentMethods: [] };
+const DEFAULT_CATEGORIES = ["Housing", "Utilities", "Groceries", "Dining", "Transportation", "Healthcare", "Subscriptions", "Entertainment", "Travel", "Other"];
+const DEFAULT_ACCOUNTS = ["Checking", "Credit Card", "Cash", "Venmo"];
+const DEFAULT_PAYMENTS = ["Credit", "Cash", "ACH/Transfer"];
+const EMPTY: ExpenseData = { transactions: [], budgets: [], categories: DEFAULT_CATEGORIES, accounts: DEFAULT_ACCOUNTS, paymentMethods: DEFAULT_PAYMENTS };
 
 export function ExpenseTracker() {
   const [month, setMonth] = useState(currentMonth());
   const [data, setData] = useState<ExpenseData>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [budgetOpen, setBudgetOpen] = useState(false);
   const [message, setMessage] = useState("");
 
   const load = useCallback(async () => {
@@ -22,7 +24,7 @@ export function ExpenseTracker() {
       const response = await fetch(`/api/expenses?month=${month}`);
       const result = await response.json() as ExpenseData & { error?: string };
       if (!response.ok) throw new Error(result.error);
-      setData(result);
+      setData({ ...result, categories: result.categories.length ? result.categories : DEFAULT_CATEGORIES, accounts: result.accounts.length ? result.accounts : DEFAULT_ACCOUNTS, paymentMethods: result.paymentMethods.length ? result.paymentMethods : DEFAULT_PAYMENTS });
     } catch { setMessage("Could not load your expenses."); }
     finally { setLoading(false); }
   }, [month]);
@@ -44,7 +46,7 @@ export function ExpenseTracker() {
       const response = await fetch("/api/expenses", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.fromEntries(new FormData(form))) });
       const result = await response.json() as { error?: string };
       if (!response.ok) throw new Error(result.error || "Unable to save.");
-      form.reset(); (form.elements.namedItem("date") as HTMLInputElement).value = today();
+      form.reset();
       await load(); setMessage("Transaction added.");
     } catch (error) { setMessage(error instanceof Error ? error.message : "Unable to save this transaction."); }
     finally { setSaving(false); }
@@ -68,7 +70,7 @@ export function ExpenseTracker() {
 
     <header className="expense-hero shell">
       <div><p className="eyebrow">Expenses · 家計</p><h1>Money,<br /><em>made clear.</em></h1></div>
-      <label>Viewing month<input type="month" value={month} onChange={(event) => setMonth(event.target.value)} /></label>
+      <label>Viewing month<select value={month} onChange={(event) => setMonth(event.target.value)}>{monthOptions().map((value) => <option value={value} key={value}>{monthLabel(value)}</option>)}</select></label>
     </header>
 
     <section className="expense-summary shell" aria-label="Monthly summary">
@@ -84,8 +86,8 @@ export function ExpenseTracker() {
         <form onSubmit={addTransaction}>
           <label className="wide">Description<input name="description" required maxLength={120} placeholder="Coffee, rent, paycheck…" /></label>
           <label>Amount<input name="amount" type="number" inputMode="decimal" required min="0.01" max="10000000" step="0.01" placeholder="0.00" /></label>
-          <label>Date<input name="date" type="date" required defaultValue={today()} /></label>
-          <label>Type<select name="type" defaultValue="expense"><option value="expense">Expense</option><option value="income">Income</option><option value="transfer">Transfer</option></select></label>
+          <label>Date <span>optional</span><input name="date" type="date" /></label>
+          <label>Type<select name="type" defaultValue="expense"><option value="expense">Expense</option><option value="income">Income</option></select></label>
           <label>Category<select name="category">{data.categories.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label>Account<select name="account">{data.accounts.map((item) => <option key={item}>{item}</option>)}</select></label>
           <label>Payment<select name="paymentMethod">{data.paymentMethods.map((item) => <option key={item}>{item}</option>)}</select></label>
@@ -96,12 +98,12 @@ export function ExpenseTracker() {
       </section>
 
       <section className="budget-panel">
-        <header><div><p className="eyebrow">Monthly plan</p><h2>Budget</h2></div><button type="button" onClick={() => setBudgetOpen(!budgetOpen)}>{budgetOpen ? "Done" : "Edit"}</button></header>
+        <header><div><p className="eyebrow">Monthly plan</p><h2>Budget</h2></div><span>Set each category</span></header>
         <div className="budget-list">{data.categories.map((category) => {
           const spent = data.transactions.filter((item) => item.type === "expense" && item.category === category).reduce((sum, item) => sum + item.amountCents, 0);
           const budget = data.budgets.find((item) => item.category === category)?.monthlyCents ?? 0;
           const ratio = budget ? Math.min(spent / budget * 100, 100) : 0;
-          return <article key={category}><div><strong>{category}</strong>{budgetOpen ? <BudgetInput category={category} cents={budget} save={saveBudget} /> : <span>{money(spent)} / {budget ? money(budget) : "—"}</span>}</div><i><b style={{ width: `${ratio}%` }} /></i></article>;
+          return <article key={category}><div><strong>{category}</strong><BudgetInput category={category} cents={budget} save={saveBudget} /></div><span className="budget-spent">{money(spent)} spent</span><i><b style={{ width: `${ratio}%` }} /></i></article>;
         })}</div>
       </section>
     </div>
@@ -117,10 +119,11 @@ export function ExpenseTracker() {
 
 function BudgetInput({ category, cents, save }: { category: string; cents: number; save: (category: string, amount: string) => void }) {
   const [value, setValue] = useState((cents / 100).toFixed(2));
-  return <span className="budget-input"><span>$</span><input aria-label={`${category} monthly budget`} type="number" min="0" step="0.01" value={value} onChange={(event) => setValue(event.target.value)} onBlur={() => void save(category, value)} /></span>;
+  return <span className="budget-input"><span>$</span><input aria-label={`${category} monthly budget`} type="number" min="0" step="0.01" value={value} onChange={(event) => setValue(event.target.value)} /><button type="button" onClick={() => void save(category, value)}>Save</button></span>;
 }
 
 function currentMonth() { return today().slice(0, 7); }
+function monthOptions() { const now = new Date(); return Array.from({ length: 18 }, (_, index) => { const value = new Date(now.getFullYear(), now.getMonth() + 2 - index, 1); return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}`; }); }
 function today() { const value = new Date(); return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, "0")}-${String(value.getDate()).padStart(2, "0")}`; }
 function money(cents: number) { return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 }).format(cents / 100); }
 function signedMoney(cents: number) { return `${cents > 0 ? "+" : cents < 0 ? "−" : ""}${money(Math.abs(cents))}`; }
