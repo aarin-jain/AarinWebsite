@@ -44,6 +44,8 @@ export function ownerProtectionForRequest(request: Request): "page" | "api" | nu
   if (
     normalizedPath === "/admin" ||
     normalizedPath.startsWith("/admin/") ||
+    normalizedPath === "/expenses" ||
+    normalizedPath.startsWith("/expenses/") ||
     normalizedPath === "/writing/new" ||
     normalizedPath.startsWith("/writing/new/") ||
     normalizedPath === "/writing/edit" ||
@@ -54,7 +56,9 @@ export function ownerProtectionForRequest(request: Request): "page" | "api" | nu
 
   if (
     normalizedPath === "/api/admin" ||
-    normalizedPath.startsWith("/api/admin/")
+    normalizedPath.startsWith("/api/admin/") ||
+    normalizedPath === "/api/expenses" ||
+    normalizedPath.startsWith("/api/expenses/")
   ) {
     return "api";
   }

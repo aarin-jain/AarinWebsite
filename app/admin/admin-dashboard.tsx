@@ -69,7 +69,7 @@ export function AdminDashboard({ name }: { name: string }) {
       <aside className="admin-sidebar">
         <a className="brand" href="/">AJ<span>.</span></a>
         <div><p className="admin-label">Workspace</p><button className={tab === "messages" ? "active" : ""} onClick={() => setTab("messages")}><span>Inbox</span><b>{unread}</b></button><button className={tab === "posts" ? "active" : ""} onClick={() => setTab("posts")}><span>Writing</span><b>{drafts}</b></button><button className={tab === "comments" ? "active" : ""} onClick={() => setTab("comments")}><span>Comments</span><b>{comments.length}</b></button></div>
-        <nav><a href="/">View portfolio ↗</a><a href="/writing">View writing ↗</a><a href="/writing/new">New article ＋</a></nav>
+        <nav><a href="/expenses">Expenses ↗</a><a href="/">View portfolio ↗</a><a href="/writing">View writing ↗</a><a href="/writing/new">New article ＋</a></nav>
       </aside>
 
       <section className="admin-main">

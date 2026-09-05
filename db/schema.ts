@@ -56,3 +56,24 @@ export const engagementRateLimits = sqliteTable("engagement_rate_limits", {
   count: integer("count").notNull(),
   expiresAt: text("expires_at").notNull(),
 });
+
+export const expenseTransactions = sqliteTable("expense_transactions", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  date: text("date").notNull(),
+  description: text("description").notNull(),
+  category: text("category").notNull(),
+  account: text("account").notNull(),
+  paymentMethod: text("payment_method").notNull(),
+  type: text("type", { enum: ["expense", "income", "transfer"] }).notNull(),
+  amountCents: integer("amount_cents").notNull(),
+  notes: text("notes").notNull().default(""),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+}, (table) => [index("idx_expense_transactions_date").on(table.date)]);
+
+export const expenseBudgets = sqliteTable("expense_budgets", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  category: text("category").notNull().unique(),
+  monthlyCents: integer("monthly_cents").notNull(),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
